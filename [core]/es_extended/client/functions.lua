@@ -653,6 +653,13 @@ function ESX.Game.GetVehicleProperties(vehicle)
             doorsBroken[tostring(doorsId)] = IsVehicleDoorDamaged(vehicle, doorsId)
         end
     end
+	
+	local vState = Entity(vehicle).state
+	local flameThrower = false
+	if vState and vState.flameThrower then
+		flameThrower = vState.flameThrower
+    end
+
 
     return {
         model = GetEntityModel(vehicle),
@@ -740,7 +747,8 @@ function ESX.Game.GetVehicleProperties(vehicle)
         modTank = GetVehicleMod(vehicle, 45),
         modDoorR = GetVehicleMod(vehicle, 47),
         modLivery = GetVehicleMod(vehicle, 48) == -1 and GetVehicleLivery(vehicle) or GetVehicleMod(vehicle, 48),
-        modLightbar = GetVehicleMod(vehicle, 49)
+        modLightbar = GetVehicleMod(vehicle, 49),
+		flameThrower = flameThrower,
     }
 end
 
@@ -972,6 +980,10 @@ function ESX.Game.SetVehicleProperties(vehicle, props)
         SetVehicleMod(vehicle, 48, props.modLivery, false)
         SetVehicleLivery(vehicle, props.modLivery)
     end
+	
+	if props.flameThrower then
+		TriggerServerEvent('flametune:force', VehToNet(vehicle), props.flameThrower)
+	end
 
     if props.windowsBroken ~= nil then
         for k, v in pairs(props.windowsBroken) do
